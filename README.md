@@ -136,6 +136,19 @@ Steps needed to do inference on tkDNN with a custom neural network.
 For specific details on how to export weights see [HERE](./docs/exporting_weights.md).
 
 ## Run the demos 
+To run the an object detection demo with C/C++:
+```
+./demo <config-file>
+# For example:
+./demo ../demo/demoConfig.yaml
+```
+
+To run the an object detection demo with python:
+```
+python trt_inference.py <network-rt-file> <n-batches> <number-of-classes> <path-to-video>
+# For example:
+python trt_inference.py build/yolo4_batch4_fp16.rt --batch_size=4 --num_classes=3 --video=demo/yolo_test.mp4
+```
 
 For specific details on how to run:
 - 2D object detection demos, details on FP16, INT8 and batching see [HERE](./docs/demo.md).

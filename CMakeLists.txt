@@ -239,6 +239,17 @@ target_link_libraries(seg_demo tkDNN)
 add_executable(demoDepth demo/demo/demoDepth.cpp)
 target_link_libraries(demoDepth tkDNN)
 
+add_executable(image demo/demo/image.cpp)
+target_link_libraries(image tkDNN)
+
+option(BUILD_SHARED_LIBS "Specifies the type of libraries (SHARED or STATIC) to build" ON)
+if (BUILD_SHARED_LIBS)
+    add_library(darknetTR SHARED demo/demo/darknetTR.cpp)
+    target_compile_definitions(darknetTR PRIVATE LIB_EXPORTS=1)
+    target_compile_definitions(darknetTR PRIVATE -DDEMO_EXPORTS)
+    target_link_libraries(darknetTR tkDNN)
+endif()
+
 #-------------------------------------------------------------------------------
 # Install
 #-------------------------------------------------------------------------------
