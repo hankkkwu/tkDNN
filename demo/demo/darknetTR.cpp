@@ -30,7 +30,7 @@ image make_empty_image(int w, int h, int c){
 
 image make_image(int w, int h, int c){
     image out = make_empty_image(w,h,c);
-    out.data = (float*)calloc(h*w*c, sizeof(float));
+    out.data = new float[h*w*c];
     return out;
 }
 
@@ -51,8 +51,9 @@ void do_inference(tk::dnn::Yolo4Detection *net, image img){
 
 void do_batch_inference(tk::dnn::Yolo4Detection *net, std::vector<image>* image_batches, int n_batch){
     std::vector<cv::Mat> batch_dnn_input;
-    for (int i = 0; i < n_batch; ++i){
-        cv::Mat frame(image_batches->at(i).h, image_batches->at(i).w, CV_8UC3, (unsigned char*)image_batches->at(i).data);
+    std::vector<image> &images = *image_batches;
+    for (image img : images){
+        cv::Mat frame(img.h, img.w, CV_8UC3, (unsigned char*)img.data);
         // push image into batch_dnn_input
         batch_dnn_input.push_back(frame);
     }
@@ -88,13 +89,11 @@ result* get_batch_boxes(tk::dnn::Yolo4Detection *net){
     batchDetected = net->get_batch_detected();
     std::vector<std::string> classesName = net->get_classesName();
 
-    result* res = (result*)calloc(batchDetected.size(), sizeof(result));
-    if (!res) throw "memory allocation failure";
+    result* res = new result[batchDetected.size()];
 
     for (int bi = 0; bi < batchDetected.size(); ++bi){
         // for each image in image batch
-        detection* det = (detection*)calloc(batchDetected[bi].size(), sizeof(detection));
-        if (!det) throw "memory allocation failure";
+        detection* det = new detection[batchDetected[bi].size()];
         for (int i = 0; i < batchDetected[bi].size(); ++i){
             // for each bbox in one image
             det[i].cl = batchDetected[bi][i].cl;
@@ -111,6 +110,10 @@ result* get_batch_boxes(tk::dnn::Yolo4Detection *net){
     return res;
 }
 
+void freeMemory(result* res){
+    delete res;
+}
+
 /* for passing batch images from python */
 std::vector<image>* new_vector(){
     return new std::vector<image>;
@@ -118,6 +121,11 @@ std::vector<image>* new_vector(){
 
 void delete_vector(std::vector<image>* v){
     // std::cout << "destructor called in C++ for " << v << std::endl;
+    std::vector<image>& vec = *v;
+    for (image img : vec){
+        // free the image data memory
+        delete img.data;
+    }
     delete v;
 }
 

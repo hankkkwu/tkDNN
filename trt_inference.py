@@ -60,6 +60,9 @@ get_batch_boxes = lib.get_batch_boxes
 get_batch_boxes.argtypes = [c_void_p]
 get_batch_boxes.restype = POINTER(RESULT)
 
+free_memory = lib.freeMemory
+free_memory.argtypes = [POINTER(RESULT)]
+
 
 class Vector(object):
     lib = CDLL("./build/libdarknetTR.so", RTLD_GLOBAL)
@@ -217,6 +220,8 @@ class YOLO4RT(object):
             batch_scores.append(scores)
             batch_classes.append(classes)
         # print("batch_boxes: ", batch_boxes)
+        # TODO: free the detection result memory
+        free_memory(result)
         return batch_boxes, batch_scores, batch_classes
 
 def parse_args():
