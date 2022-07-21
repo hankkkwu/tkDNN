@@ -111,7 +111,7 @@ result* get_batch_boxes(tk::dnn::Yolo4Detection *net){
 }
 
 void freeMemory(result* res){
-    delete res;
+    delete [] res;
 }
 
 /* for passing batch images from python */
@@ -124,7 +124,7 @@ void delete_vector(std::vector<image>* v){
     std::vector<image>& vec = *v;
     for (image img : vec){
         // free the image data memory
-        delete img.data;
+        delete [] img.data;
     }
     delete v;
 }
